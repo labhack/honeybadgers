@@ -1,10 +1,9 @@
 {% extends "dataviewer/base.html" %}
 {% load staticfiles %}
 {% block content %}
-<head>
   <script type="text/javascript" src=" {% static "dataviewer/d3.min.js" %} "></script>
-</head>
-<body>
+  <script type="text/javascript" src=" {% static "dataviewer/cubism.v1.min.js" %} "></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
 <style>
 
 .chart div {
@@ -17,13 +16,63 @@
 }
 
 </style>
-<div class="chart">
-  <div style="width: 40px;">4</div>
-  <div style="width: 80px;">8</div>
-  <div style="width: 150px;">15</div>
-  <div style="width: 160px;">16</div>
-  <div style="width: 230px;">23</div>
-  <div style="width: 420px;">42</div>
-</div>
-</body>
+<div id="chart"></div>
+<script>
+
+function random(name) {
+  var value = 0,
+      values = [],
+      i = 0,
+      last;
+  return context.metric(function(start, stop, step, callback) {
+    start = +start, stop = +stop;
+    if (isNaN(last)) last = start;
+    while (last < stop) {
+      last += step;
+      d3.json(" {% static "dataviewer/data/" %}" + name + ".json", function(rows) {        
+	        // Creates an array of the price differences throughout the day
+	        rows.forEach(function(d) {
+	            values.push(value = d[1]);
+	    	}); 
+    }
+    callback(null, values = values.slice((start - stop) / step));
+  }, name);
+}
+
+</script>
+<script>
+
+var context = cubism.context()
+    .serverDelay(0)
+    .clientDelay(0)
+    .step(1e3)
+    .size(960);
+
+var foo = random("foo"),
+    bar = random("bar");
+
+d3.select("#chart").call(function(div) {
+
+  div.append("div")
+      .attr("class", "axis")
+      .call(context.axis().orient("top"));
+
+  div.selectAll(".horizon")
+      .data([foo, bar, foo.add(bar), foo.subtract(bar)])
+    .enter().append("div")
+      .attr("class", "horizon")
+      .call(context.horizon().extent([-20, 20]));
+
+  div.append("div")
+      .attr("class", "rule")
+      .call(context.rule());
+
+});
+
+// On mousemove, reposition the chart values to match the rule.
+context.on("focus", function(i) {
+  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+});
+
+</script>
 {% endblock %}
