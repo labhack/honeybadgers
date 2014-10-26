@@ -1,78 +1,41 @@
 {% extends "dataviewer/base.html" %}
 {% load staticfiles %}
 {% block content %}
+  <script type="text/javascript" src=" {% static "dataviewer/jquery-1.11.1.min.js" %} "></script>
+  <script type="text/javascript" src=" {% static "dataviewer/bootstrap.min.js" %} "></script>
   <script type="text/javascript" src=" {% static "dataviewer/d3.min.js" %} "></script>
-  <script type="text/javascript" src=" {% static "dataviewer/cubism.v1.min.js" %} "></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
-<style>
-
-.chart div {
-  font: 10px sans-serif;
-  background-color: steelblue;
-  text-align: right;
-  padding: 3px;
-  margin: 1px;
-  color: white;
-}
-
-</style>
-<div id="chart"></div>
+  <script type="text/javascript" src=" {% static "dataviewer/epoch.min.js" %} "></script>
+  <script type="text/javascript" src=" {% static "dataviewer/data.js" %} "></script>
+  <script type="text/javascript" src=" {% static "dataviewer/ZeroClipboard.min.js" %} "></script>
+  <link rel="stylesheet" type="text/css" href=" {%static "dataviewer/epoch.min.css" %} "></script>
+<div id="lineChart1" style="width: 1000px; height:200px;"></div>
 <script>
+$(function() {
+    var data = new RealTimeData(1);
 
-function random(name) {
-  var value = 0,
-      values = [],
-      i = 0,
-      last;
-  return context.metric(function(start, stop, step, callback) {
-    start = +start, stop = +stop;
-    if (isNaN(last)) last = start;
-    while (last < stop) {
-      last += step;
-      d3.json(" {% static "dataviewer/data/" %}" + name + ".json", function(rows) {        
-	        // Creates an array of the price differences throughout the day
-	        rows.forEach(function(d) {
-	            values.push(value = d[1]);
-	    	}); 
-    }
-    callback(null, values = values.slice((start - stop) / step));
-  }, name);
-}
+    var chart = $('#lineChart'1).epoch({
+        type: 'time.line',
+        data: data.history(),
+        axes: ['left', 'bottom', 'right']
+    });
 
+    setInterval(function() { chart.push(data.next()); }, 1000);
+    chart.push(data.next());
+});
 </script>
+<div id="lineChart2" style="width: 1000px; height:200px;"></div>
 <script>
+$(function() {
+    var data = new RealTimeData(1);
 
-var context = cubism.context()
-    .serverDelay(0)
-    .clientDelay(0)
-    .step(1e3)
-    .size(960);
+    var chart = $('#lineChart2').epoch({
+        type: 'time.line',
+        data: data.history(),
+        axes: ['left', 'bottom', 'right']
+    });
 
-var foo = random("foo"),
-    bar = random("bar");
-
-d3.select("#chart").call(function(div) {
-
-  div.append("div")
-      .attr("class", "axis")
-      .call(context.axis().orient("top"));
-
-  div.selectAll(".horizon")
-      .data([foo, bar, foo.add(bar), foo.subtract(bar)])
-    .enter().append("div")
-      .attr("class", "horizon")
-      .call(context.horizon().extent([-20, 20]));
-
-  div.append("div")
-      .attr("class", "rule")
-      .call(context.rule());
-
+    setInterval(function() { chart.push(data.next()); }, 1000);
+    chart.push(data.next());
 });
-
-// On mousemove, reposition the chart values to match the rule.
-context.on("focus", function(i) {
-  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
-});
-
 </script>
 {% endblock %}
