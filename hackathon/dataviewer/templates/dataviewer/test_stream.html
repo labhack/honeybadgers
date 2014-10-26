@@ -1,0 +1,15 @@
+{% extends "dataviewer/base.html" %}
+{% block extrahead %}
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+{% endblock %}
+{% block content %}
+<div id="putstuffhere">
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.getJSON("{% url 'stream_data' %}", function(data) {
+            alert(data);
+        });
+    });
+</script>
+{% endblock %}

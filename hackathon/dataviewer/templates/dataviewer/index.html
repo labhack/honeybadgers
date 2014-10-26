@@ -1,6 +1,7 @@
 {% extends "dataviewer/base.html" %}
 {% load staticfiles %}
 {% block content %}
+<script type="text/javascript">var dataUrl = "{% url 'honeybadger' %}";</script>
   <script type="text/javascript" src=" {% static "dataviewer/jquery-1.11.1.min.js" %} "></script>
   <script type="text/javascript" src=" {% static "dataviewer/bootstrap.min.js" %} "></script>
   <script type="text/javascript" src=" {% static "dataviewer/d3.min.js" %} "></script>
@@ -11,30 +12,19 @@
 <div id="lineChart1" style="width: 1000px; height:200px;"></div>
 <script>
 $(function() {
+
     var data = new RealTimeData(1);
 
-    var chart = $('#lineChart'1).epoch({
+    var chart = $('#lineChart1').epoch({
         type: 'time.line',
         data: data.history(),
         axes: ['left', 'bottom', 'right']
     });
 
-    setInterval(function() { chart.push(data.next()); }, 1000);
-    chart.push(data.next());
-});
-</script>
-<div id="lineChart2" style="width: 1000px; height:200px;"></div>
-<script>
-$(function() {
-    var data = new RealTimeData(1);
+    setInterval(function() {
+       chart.push(data.next());
+    }, 500);
 
-    var chart = $('#lineChart2').epoch({
-        type: 'time.line',
-        data: data.history(),
-        axes: ['left', 'bottom', 'right']
-    });
-
-    setInterval(function() { chart.push(data.next()); }, 1000);
     chart.push(data.next());
 });
 </script>
