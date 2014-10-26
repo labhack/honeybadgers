@@ -1,0 +1,7 @@
+{% load staticfiles %}
+<head>
+  <script type="text/javascript" src= "C:/Users/Matt/Google Drive/Labhack/Repo/hackathon/dataviewer/static/dataviewer/d3.min.js" ></script>
+</head>
+<body>
+  <p>Hello!</p>
+</body>
